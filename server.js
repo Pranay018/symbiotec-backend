@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import path from "path";
 import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -28,7 +29,7 @@ app.use(
 
 
 app.use(express.json());
-app.use("/uploads", express.static("uploads"));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 /* ROUTES */
 app.use("/api/auth", authRoutes);

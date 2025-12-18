@@ -1,6 +1,7 @@
 import express from "express";
-import { publicContent } from "../controllers/contentController.js";
 import multer from "multer";
+import path from "path";
+import fs from "fs";
 import auth from "../middleware/auth.middleware.js";
 import {
   listContent,
@@ -12,13 +13,24 @@ import {
   versions,
   updateContent,
   deleteContent,
+  publicContent,
 } from "../controllers/contentController.js";
 
 const router = express.Router();
 
-/* FILE UPLOAD */
+/* ===================== FILE UPLOAD (FIXED) ===================== */
+
+const uploadDir = path.join(process.cwd(), "uploads/files");
+
+// ✅ Ensure folder exists (VERY IMPORTANT)
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination: "uploads/files",
+  destination: (_, __, cb) => {
+    cb(null, uploadDir);
+  },
   filename: (_, file, cb) => {
     cb(null, Date.now() + "-" + file.originalname);
   },
@@ -26,13 +38,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-/* ROUTES */
+/* ===================== ROUTES ===================== */
+
 router.get("/", listContent);
 router.get("/content", publicContent);
 
-
 router.post("/", auth, upload.array("files"), createContent);
-
 router.put("/:id", auth, upload.array("files"), updateContent);
 
 router.delete("/:id", auth, deleteContent);
@@ -43,6 +54,5 @@ router.post("/:id/reject", auth, reject);
 router.post("/:id/publish", auth, publish);
 
 router.get("/:id/versions", auth, versions);
-
 
 export default router;
