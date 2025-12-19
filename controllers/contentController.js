@@ -12,6 +12,19 @@ const safeJSON = (value, fallback = {}) => {
   }
 };
 
+
+const parseJSONSafe = (value, fallback) => {
+  if (!value) return fallback;
+  if (typeof value === "object") return value;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return fallback;
+  }
+};
+
+
+
 const safeUnlink = (filePath) => {
   try {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
@@ -31,7 +44,7 @@ export async function listContent(req, res, next) {
     if (q) filter.title = { $regex: q, $options: "i" };
 
     const items = await Content.find(filter).sort({ createdAt: -1 });
-    res.json(items);
+    res.json(items);  
   } catch (err) {
     next(err);
   }
@@ -40,11 +53,9 @@ export async function listContent(req, res, next) {
 /* ===================== CREATE ===================== */
 export async function createContent(req, res, next) {
   try {
-    const meta = safeJSON(req.body.meta, {});
-    const files = (req.files || []).map((f) => ({
-      name: f.originalname,
-      path: `/uploads/files/${f.filename}`,
-    }));
+const meta = parseJSONSafe(req.body?.meta, {});
+let files = parseJSONSafe(content.files_json, []);
+
 
     const content = await Content.create({
       ...meta,
@@ -181,17 +192,18 @@ export async function versions(req, res, next) {
 }
 
 /* ===================== PUBLIC CONTENT ===================== */
-export async function publicContent(req, res, next) {
+export async function publicContent(req, res) {
   try {
     const { category, subcategory } = req.query;
-
     const filter = { status: "Published" };
+
     if (category) filter.category = category;
     if (subcategory) filter.subcategory = subcategory;
 
     const items = await Content.find(filter).sort({ createdAt: -1 });
     res.json(items);
   } catch (err) {
-    next(err);
+    console.error("PUBLIC CONTENT ERROR:", err);
+    res.status(500).json({ message: err.message });
   }
 }
