@@ -16,7 +16,9 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "http://symbiotec.com",
+      "https://symbiotec.com",
+      "https://symbiotec.com",
+      "https://www.symbiotec.com",
       "http://investor.symbiotec.com",
       "https://investor.symbiotec.com",
     ],
