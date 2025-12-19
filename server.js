@@ -20,7 +20,7 @@ app.use(
       "https://symbiotec.com",
       "https://www.symbiotec.com",
       "http://investor.symbiotec.com",
-      "https://investor.symbiotec.com",
+      "https://www.investor.symbiotec.com",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
