@@ -46,7 +46,8 @@ router.get("/content", publicContent);
 router.post("/", auth, upload.array("files"), createContent);
 router.put("/:id", auth, upload.array("files"), updateContent);
 
-router.delete("/:id", auth, deleteContent);
+router.post("/:id/delete", auth, deleteContent);
+
 
 router.post("/:id/submit", auth, submit);
 router.post("/:id/approve", auth, approve);

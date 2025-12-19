@@ -6,18 +6,17 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 
-
 import authRoutes from "./routes/auth.Routes.js";
 import contentRoutes from "./routes/content.Routes.js";
 import publicRoutes from "./routes/public.Routes.js";
-
-
+  
 const app = express();
 
 app.use(
   cors({
     origin: [
       "http://localhost:5173",
+      "http://symbiotec.com",
       "http://investor.symbiotec.com",
       "https://investor.symbiotec.com",
     ],
