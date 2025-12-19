@@ -53,6 +53,17 @@ mongoose
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB error:", err));
 
+
+  app.use((err, req, res, next) => {
+  console.error("🔥 SERVER ERROR:", err);
+
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
+
 /* ===================== SERVER ===================== */
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
