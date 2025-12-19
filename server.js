@@ -19,7 +19,7 @@ app.use(
       "http://localhost:5173",
       "https://symbiotec.com",
       "https://www.symbiotec.com",
-      "https://investor.symbiotec.com", // ✅ NO trailing slash
+      "https://investor.symbiotec.com",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -27,15 +27,11 @@ app.use(
   })
 );
 
-// ✅ Required for preflight requests
-app.options("*", cors());
-
-/* ===================== BODY SIZE LIMIT (IMPORTANT) ===================== */
+/* ===================== BODY SIZE LIMIT ===================== */
 app.use(express.json({ limit: "30mb" }));
 app.use(express.urlencoded({ limit: "30mb", extended: true }));
 
-/* ===================== STATIC FILES ===================== */
-/* ⚠️ Render disk is temporary — OK for now */
+/* ===================== STATIC ===================== */
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 /* ===================== ROUTES ===================== */
@@ -47,24 +43,21 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "Backend is running 🚀" });
 });
 
+/* ===================== ERROR HANDLER (REQUIRED) ===================== */
+app.use((err, req, res, next) => {
+  console.error("🔥 SERVER ERROR:", err);
+  res.status(500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
+});
+
 /* ===================== DB ===================== */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
   .catch((err) => console.error("❌ MongoDB error:", err));
 
-
-  app.use((err, req, res, next) => {
-  console.error("🔥 SERVER ERROR:", err);
-
-  res.status(err.status || 500).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
-});
-
-
-/* ===================== SERVER ===================== */
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
